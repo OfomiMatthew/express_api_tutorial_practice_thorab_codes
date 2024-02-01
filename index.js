@@ -44,7 +44,6 @@ const productSchema = mongoose.Schema(
     quantity: {
       type: Number,
       required: true,
-   
     },
 
     category: {
@@ -57,11 +56,69 @@ const productSchema = mongoose.Schema(
 
 const productModel = mongoose.model("products", productSchema);
 
-app.post("/products", (req, res) => {
-  console.log(req.body)
-  productModel.create(req.body)
-  res.send({message:"Data created"})
+// get all data
+
+app.get("/products", (req, res) => {
+  productModel
+    .find()
+    .then((products) => {
+      res.send(products);
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
 });
+
+// get one product
+
+app.get("/products/:id", (req, res) => {
+  productModel
+    .findOne({ _id: req.params.id })
+    .then((product) => {
+      res.send(product);
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+});
+
+// Create (Post request)
+app.post("/products", (req, res) => {
+  productModel
+    .create(req.body)
+    .then((document) => {
+      res.send({ data: document, message: "Product created" });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({ message: "Issue occured while creating data" });
+    });
+});
+
+//  delete post
+app.delete("/products/:id", (req, res) => {
+  productModel
+    .deleteOne({ _id: req.params.id })
+    .then(() => {
+      res.send({message:"product deleted"});
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+});
+
+// update operation
+
+app.put('/products/:id',(req,res)=>{
+  productModel
+    .updateOne({ _id: req.params.id },req.body)
+    .then(() => {
+      res.send({message:"product updated"});
+    })
+    .catch((err) => {
+      console.log(err.message);
+    });
+})
 
 app.listen(9000, () => {
   console.log("server running");
