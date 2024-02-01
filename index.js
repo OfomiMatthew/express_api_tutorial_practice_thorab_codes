@@ -1,29 +1,68 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const app = express();
 
+app.use(express.json());
 
-function mw(req,res,next){
-  if(req.params.id <10){
-    res.send("You cannot access the file")
-  }else{
-    next()
+function mw(req, res, next) {
+  if (req.params.id < 10) {
+    res.send("You cannot access the file");
+  } else {
+    next();
   }
 }
-app.use(mw)
+app.use(mw);
 
-app.get('/products',(req,res)=>{
-console.log("data gotten")
-res.send({message:"data gotten"})
-})
+mongoose
+  .connect(
+    "mongodb+srv://ofomimatthew7:jerryhope1994@cluster0.e4jquae.mongodb.net/thorabcodes_api_dev_demo"
+  )
+  .then(() => {
+    console.log("connected successfully");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
-app.get('/users/:id',(req,res)=>{
-  console.log(req.params.id)
-  res.send({message:`data gotten from user`})
-})
+const productSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Name is mandatory"],
+    },
 
+    description: {
+      type: String,
+      required: true,
+    },
 
+    price: {
+      type: Number,
+      required: true,
+    },
 
+    quantity: {
+      type: Number,
+      required: true,
+   
+    },
 
-app.listen(9000,()=>{
-  console.log('server running')
-})
+    category: {
+      type: String,
+      enum: ["Clothing", "Electronics", "Household"],
+    },
+  },
+  { timestamps: true }
+);
+
+const productModel = mongoose.model("products", productSchema);
+
+app.post("/products", (req, res) => {
+  console.log(req.body)
+  productModel.create(req.body)
+  res.send({message:"Data created"})
+});
+
+app.listen(9000, () => {
+  console.log("server running");
+});
