@@ -24,6 +24,32 @@ mongoose
     console.log(err);
   });
 
+// user schema
+
+const userSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Name is mandatory"],
+    },
+
+    email: {
+      type: String,
+      required: [true, "Email is mandatory"],
+    },
+
+    password: {
+      type: String,
+      required: [true, "Password is mandatory"],
+    },
+  },
+  { timestamps: true }
+);
+
+const userModel = mongoose.model("users", userSchema)
+
+// products schema
+
 const productSchema = mongoose.Schema(
   {
     name: {
@@ -100,7 +126,7 @@ app.delete("/products/:id", (req, res) => {
   productModel
     .deleteOne({ _id: req.params.id })
     .then(() => {
-      res.send({message:"product deleted"});
+      res.send({ message: "product deleted" });
     })
     .catch((err) => {
       console.log(err.message);
@@ -109,16 +135,16 @@ app.delete("/products/:id", (req, res) => {
 
 // update operation
 
-app.put('/products/:id',(req,res)=>{
+app.put("/products/:id", (req, res) => {
   productModel
-    .updateOne({ _id: req.params.id },req.body)
+    .updateOne({ _id: req.params.id }, req.body)
     .then(() => {
-      res.send({message:"product updated"});
+      res.send({ message: "product updated" });
     })
     .catch((err) => {
       console.log(err.message);
     });
-})
+});
 
 app.listen(9000, () => {
   console.log("server running");
