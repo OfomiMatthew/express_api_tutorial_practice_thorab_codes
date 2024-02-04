@@ -48,6 +48,15 @@ const userSchema = mongoose.Schema(
 
 const userModel = mongoose.model("users", userSchema)
 
+// create user
+
+app.post('/users/',(req,res)=>{
+  userModel.create(req.body)
+})
+
+
+
+
 // products schema
 
 const productSchema = mongoose.Schema(
