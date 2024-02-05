@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bcryptjs = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -65,7 +66,6 @@ app.post("/register/", (req, res) => {
   });
 });
 
-
 // login endpoint
 app.post("/login/", (req, res) => {
   let userCred = req.body;
@@ -76,7 +76,15 @@ app.post("/login/", (req, res) => {
       if (user !== null) {
         bcryptjs.compare(userCred.password, user.password, (err, result) => {
           if (result === true) {
-            res.send({ message: "login success" });
+            jwt.sign({ email: userCred.email }, "mattkey", (err, token) => {
+              if (!err) {
+                res.send({ token: token });
+              } else {
+                res.send("issue occured creating token");
+              }
+            });
+
+            // res.send({ message: "login success" });
           } else {
             res.send({ message: "Incorrect password" });
           }
@@ -92,6 +100,26 @@ app.post("/login/", (req, res) => {
 });
 
 
+// endpoint for accessibility i.e to know if you have a token or not
+
+app.get('/getdata/',verifyToken, (req,res)=>{
+  res.send({message:"accessible endpoint"})
+})
+
+function verifyToken(req,res,next){
+let token = req.headers.authorization.split(' ')[1]
+jwt.verify(token,"mattkey",(err,data)=>{
+  if(!err){
+    console.log(data)
+    next()
+  }else{
+    res.send({message:"invalid token please login"})
+  }
+})
+
+// res.send("coming from middleware")
+
+}
 
 app.listen(9000, () => {
   console.log("server running");
