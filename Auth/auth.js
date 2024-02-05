@@ -40,7 +40,7 @@ const userSchema = mongoose.Schema(
 
 const userModel = mongoose.model("users", userSchema);
 
-// create user
+// register user endpoint
 app.post("/register/", (req, res) => {
   let user = req.body;
 
@@ -63,9 +63,35 @@ app.post("/register/", (req, res) => {
       });
     }
   });
-
- 
 });
+
+
+// login endpoint
+app.post("/login/", (req, res) => {
+  let userCred = req.body;
+
+  userModel
+    .findOne({ email: userCred.email })
+    .then((user) => {
+      if (user !== null) {
+        bcryptjs.compare(userCred.password, user.password, (err, result) => {
+          if (result === true) {
+            res.send({ message: "login success" });
+          } else {
+            res.send({ message: "Incorrect password" });
+          }
+        });
+      } else {
+        res.send("wrong user email");
+      }
+      console.log(user);
+    })
+    .catch((err) => {
+      res.send(err.message);
+    });
+});
+
+
 
 app.listen(9000, () => {
   console.log("server running");
